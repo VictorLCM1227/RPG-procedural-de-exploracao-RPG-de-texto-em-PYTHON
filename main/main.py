@@ -15,3 +15,4 @@ match escolha_menu:
     case 2:
         cabecalho('FAZER LOGIN', '-')
         conta = login()
+        escolha_jogo = menu('RPG: ELIXIR', '>>> Escolha: ', ['Sair', 'Iniciar novo jogo'])
