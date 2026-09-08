@@ -1,16 +1,67 @@
-# main/jogo.py
-
 from time import sleep
+
 from utilidades import menu, cabecalho, linha
 from classes.personagem import Personagem
 from labirinto import iniciar_labirinto
 
 
 def escrever(msg):
+    print(linha())
+
     for caractere in msg:
         print(caractere, end='', flush=True)
         sleep(0.1)
+
     print()
+
+
+def game_over():
+    cabecalho('GAME OVER', '=')
+
+    print('Você morreu.')
+    print()
+    print('Sua busca pelo Elixir chegou ao fim.')
+    print()
+
+    escolha = menu(
+        'GAME OVER',
+        '>>> Escolha: ',
+        [
+            'Sair',
+            'Voltar ao menu'
+        ],
+        simb='-'
+    )
+
+    return escolha
+
+def tela_vitoria():
+    cabecalho('VITÓRIA', '=')
+
+    print('Você encontrou o Elixir!')
+    print()
+    print('Depois de atravessar os labirintos')
+    print('e enfrentar seus perigos,')
+    print('você finalmente alcançou seu objetivo.')
+    print()
+    print('O Elixir capaz de curar todas as doenças')
+    print('da humanidade agora está em suas mãos.')
+    print()
+
+    print('Você venceu a aventura!')
+    print()
+
+    escolha = menu(
+        'VITÓRIA',
+        '>>> Escolha: ',
+        [
+            'Sair',
+            'Voltar ao menu'
+        ],
+        simb='-'
+    )
+
+    return escolha
 
 
 def jogar():
@@ -50,7 +101,11 @@ def jogar():
     escolha_menu = menu(
         'O QUE FAZER?',
         '>>> Escolha: ',
-        ['Sair', 'Explorar', 'Gritar por ajuda'],
+        [
+            'Sair',
+            'Explorar',
+            'Gritar por ajuda'
+        ],
         simb='-'
     )
 
@@ -61,11 +116,15 @@ def jogar():
 
         case 1:
             cabecalho('EXPLORAR')
-            iniciar_labirinto(personagem)
-            
+
+            resultado = iniciar_labirinto(personagem)
+
+            if resultado == 'derrota':
+                game_over()
+
+            elif resultado == 'vitoria':
+                tela_vitoria()
 
         case 2:
             cabecalho('SOCORROOOOO!!!')
             escrever('Ninguém te ouviu...')
-
-            

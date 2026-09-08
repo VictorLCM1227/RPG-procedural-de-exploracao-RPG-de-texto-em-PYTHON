@@ -187,6 +187,8 @@ def mover_jogador(mapa, linha, coluna, tecla):
 
     return linha, coluna, evento
 
+def remover_evento(mapa, linha, coluna):
+    mapa[linha][coluna] = ' '
 
 def iniciar_labirinto(personagem, dificuldade=1):
 
@@ -271,33 +273,18 @@ def iniciar_labirinto(personagem, dificuldade=1):
 
             print()
             print('Você encontrou um MONSTRO!')
-            print()
 
-            resultado = combate(
-                personagem,
-                dificuldade
-            )
+            resultado = combate(personagem, dificuldade)
 
-            # O jogador morreu
-            if resultado == 'derrota':
+            if resultado == 'vitoria':
+                remover_evento(
+                    mapa,
+                    jogador_linha,
+                    jogador_coluna
+                )
+
+            elif resultado == 'derrota':
                 return 'derrota'
-
-            # O jogador venceu ou fugiu
-            # Volta para o labirinto normalmente
-            if resultado in ('vitoria', 'fugiu'):
-
-                print()
-
-                if resultado == 'vitoria':
-                    print('Você derrotou o monstro!')
-                else:
-                    print('Você conseguiu fugir!')
-
-                print('Você continua explorando o labirinto...')
-
-        # =========================
-        # ITEM
-        # =========================
 
         elif evento == 'I':
 
@@ -307,9 +294,11 @@ def iniciar_labirinto(personagem, dificuldade=1):
             # Futuramente:
             # adicionar_item(inventario)
 
-        # =========================
-        # TESOURO
-        # =========================
+            remover_evento(
+                mapa,
+                jogador_linha,
+                jogador_coluna
+            )
 
         elif evento == 'T':
 
@@ -318,3 +307,9 @@ def iniciar_labirinto(personagem, dificuldade=1):
 
             # Futuramente:
             # abrir_tesouro(inventario)
+
+            remover_evento(
+                mapa,
+                jogador_linha,
+                jogador_coluna
+            )
