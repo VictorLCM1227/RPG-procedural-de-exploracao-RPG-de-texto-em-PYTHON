@@ -1,6 +1,6 @@
 from random import choice
 
-from main.classes.racas import (
+from classes.racas import (
 Humano,
 Elfo,
 Anao,
@@ -9,7 +9,7 @@ Demonio,
 Orc
 )
 
-from main.classes.classes import (
+from classes.classes import (
 Mago,
 Guerreiro,
 Ladino,

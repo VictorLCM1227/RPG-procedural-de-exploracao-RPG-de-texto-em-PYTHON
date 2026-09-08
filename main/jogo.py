@@ -6,7 +6,6 @@ from classes.personagem import Personagem
 
 
 def escrever(msg):
-    print(linha)
     for caractere in msg:
         print(caractere, end='', flush=True)
         sleep(0.1)
