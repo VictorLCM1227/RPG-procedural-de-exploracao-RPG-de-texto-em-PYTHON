@@ -1,6 +1,7 @@
-# main/labirinto
 from random import choice, randint
 from rich import print
+
+from combate import combate
 
 
 def criar_mapa(linhas=21, colunas=41):
@@ -187,7 +188,7 @@ def mover_jogador(mapa, linha, coluna, tecla):
     return linha, coluna, evento
 
 
-def iniciar_labirinto(dificuldade=1):
+def iniciar_labirinto(personagem, dificuldade=1):
 
     linhas = 21
     colunas = 41
@@ -232,6 +233,10 @@ def iniciar_labirinto(dificuldade=1):
             tecla
         )
 
+        # =========================
+        # SAÍDA VERDADEIRA
+        # =========================
+
         if evento == 'S':
 
             print()
@@ -239,6 +244,10 @@ def iniciar_labirinto(dificuldade=1):
             print('O caminho para o Elixir está próximo...')
 
             return 'vitoria'
+
+        # =========================
+        # SAÍDA FALSA
+        # =========================
 
         elif evento == 'F':
 
@@ -249,15 +258,46 @@ def iniciar_labirinto(dificuldade=1):
 
             dificuldade += 1
 
-            return iniciar_labirinto(dificuldade)
+            return iniciar_labirinto(
+                personagem,
+                dificuldade
+            )
+
+        # =========================
+        # MONSTRO
+        # =========================
 
         elif evento == 'M':
 
             print()
             print('Você encontrou um MONSTRO!')
+            print()
 
-            # Futuramente:
-            # iniciar_combate(personagem)
+            resultado = combate(
+                personagem,
+                dificuldade
+            )
+
+            # O jogador morreu
+            if resultado == 'derrota':
+                return 'derrota'
+
+            # O jogador venceu ou fugiu
+            # Volta para o labirinto normalmente
+            if resultado in ('vitoria', 'fugiu'):
+
+                print()
+
+                if resultado == 'vitoria':
+                    print('Você derrotou o monstro!')
+                else:
+                    print('Você conseguiu fugir!')
+
+                print('Você continua explorando o labirinto...')
+
+        # =========================
+        # ITEM
+        # =========================
 
         elif evento == 'I':
 
@@ -267,6 +307,10 @@ def iniciar_labirinto(dificuldade=1):
             # Futuramente:
             # adicionar_item(inventario)
 
+        # =========================
+        # TESOURO
+        # =========================
+
         elif evento == 'T':
 
             print()
@@ -274,5 +318,3 @@ def iniciar_labirinto(dificuldade=1):
 
             # Futuramente:
             # abrir_tesouro(inventario)
-
-

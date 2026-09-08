@@ -1,6 +1,7 @@
-# main/combate
+# main/combate.py
 
 from random import choice
+
 from rich import print
 from rich.panel import Panel
 
@@ -77,10 +78,17 @@ def criar_monstro(dificuldade=1):
     raca = sortear_raca()
     classe = sortear_classe()
 
-    vida = raca.vida * classe.modificador_vida
-    ataque = raca.ataque * classe.modificador_ataque
-    defesa = raca.defesa * classe.modificador_defesa
-    velocidade = raca.velocidade * classe.modificador_velocidade
+    # Atributos base da raça
+    vida = raca.vida
+    ataque = raca.ataque
+    defesa = raca.defesa
+    velocidade = raca.velocidade
+
+    # Modificadores da classe
+    vida *= classe.modificador_vida
+    ataque *= classe.modificador_ataque
+    defesa *= classe.modificador_defesa
+    velocidade *= classe.modificador_velocidade
 
     # A dificuldade aumenta os atributos do monstro
     vida += dificuldade * 5
@@ -90,13 +98,19 @@ def criar_monstro(dificuldade=1):
 
     monstro = {
         'nome': f'{raca.nome} {classe.nome}',
+
         'raca': raca,
         'classe': classe,
+
         'vida': round(vida),
         'vida_maxima': round(vida),
+
         'ataque': round(ataque),
         'defesa': round(defesa),
-        'velocidade': round(velocidade)
+        'velocidade': round(velocidade),
+
+        # Indica se o monstro está defendendo
+        'defendendo': False
     }
 
     return monstro
@@ -126,6 +140,13 @@ def mostrar_status(personagem, monstro):
         f'Velocidade: {monstro["velocidade"]}'
     )
 
+    if monstro['defendendo']:
+
+        painel += (
+            '\n\n'
+            '[yellow]MONSTRO ESTÁ DEFENDENDO[/yellow]'
+        )
+
     print(
         Panel(
             painel,
@@ -141,7 +162,7 @@ def mostrar_status(personagem, monstro):
 
 def calcular_dano(ataque, defesa):
 
-    # Só existe dano se o ataque for maior que a defesa.
+    # O ataque precisa ser maior que a defesa.
     if ataque <= defesa:
         return 0
 
@@ -154,9 +175,24 @@ def calcular_dano(ataque, defesa):
 
 def atacar_jogador(personagem, monstro):
 
+    defesa = monstro['defesa']
+
+    # Se o monstro estiver defendendo,
+    # sua defesa é dobrada neste ataque.
+    if monstro['defendendo']:
+
+        defesa *= 2
+
+        print()
+
+        print(
+            '[yellow]O monstro está defendendo! '
+            'A defesa dele foi aumentada.[/yellow]'
+        )
+
     dano = calcular_dano(
         personagem.ataque,
-        monstro['defesa']
+        defesa
     )
 
     print()
@@ -173,7 +209,7 @@ def atacar_jogador(personagem, monstro):
         monstro['vida'] -= dano
 
         print(
-            f'[blue]Você atacou![/blue]'
+            '[blue]Você atacou![/blue]'
         )
 
         print(
@@ -184,12 +220,19 @@ def atacar_jogador(personagem, monstro):
         if monstro['vida'] < 0:
             monstro['vida'] = 0
 
+    # A defesa dura somente um ataque.
+    monstro['defendendo'] = False
+
 
 # ============================================================
 # ATAQUE DO MONSTRO
 # ============================================================
 
-def atacar_monstro(personagem, monstro, jogador_defendendo=False):
+def atacar_monstro(
+    personagem,
+    monstro,
+    jogador_defendendo=False
+):
 
     dano = calcular_dano(
         monstro['ataque'],
@@ -198,6 +241,7 @@ def atacar_monstro(personagem, monstro, jogador_defendendo=False):
 
     print()
 
+    # O ataque não superou a defesa
     if dano == 0:
 
         print(
@@ -208,11 +252,12 @@ def atacar_monstro(personagem, monstro, jogador_defendendo=False):
         return
 
     # Se o jogador estiver defendendo,
-    # o dano recebido é reduzido pela metade.
+    # o dano recebido será reduzido pela metade.
     if jogador_defendendo:
 
-        dano = dano // 2
+        dano //= 2
 
+        # Garante pelo menos 1 de dano
         if dano < 1:
             dano = 1
 
@@ -242,6 +287,8 @@ def atacar_monstro(personagem, monstro, jogador_defendendo=False):
 
 def defesa_monstro(monstro):
 
+    monstro['defendendo'] = True
+
     print()
 
     print(
@@ -249,17 +296,31 @@ def defesa_monstro(monstro):
         f'assumiu uma posição defensiva![/red]'
     )
 
+    print(
+        '[yellow]A defesa do monstro será aumentada '
+        'contra o próximo ataque.[/yellow]'
+    )
+
 
 # ============================================================
 # TURNO DO MONSTRO
 # ============================================================
 
-def turno_monstro(personagem, monstro):
+def turno_monstro(
+    personagem,
+    monstro,
+    jogador_defendendo=False
+):
 
     print()
 
-    cabecalho('TURNO DO MONSTRO', '-')
+    cabecalho(
+        'TURNO DO MONSTRO',
+        '-'
+    )
 
+    # O monstro escolhe aleatoriamente
+    # entre atacar e defender.
     escolha = choice([
         'atacar',
         'defender'
@@ -269,7 +330,8 @@ def turno_monstro(personagem, monstro):
 
         atacar_monstro(
             personagem,
-            monstro
+            monstro,
+            jogador_defendendo
         )
 
         return 'atacar'
@@ -293,7 +355,20 @@ def tentar_fugir(personagem, monstro):
         '[yellow]Você tentou fugir![/yellow]'
     )
 
+    print(
+        f'Sua velocidade: '
+        f'[blue]{personagem.velocidade}[/blue]'
+    )
+
+    print(
+        f'Velocidade do monstro: '
+        f'[red]{monstro["velocidade"]}[/red]'
+    )
+
+    # O jogador precisa ser mais rápido.
     if personagem.velocidade > monstro['velocidade']:
+
+        print()
 
         print(
             '[green]Você é mais rápido que o monstro![/green]'
@@ -305,8 +380,10 @@ def tentar_fugir(personagem, monstro):
 
         return True
 
+    print()
+
     print(
-        '[red]Você é mais lento que o monstro![/red]'
+        '[red]Você não é mais rápido que o monstro![/red]'
     )
 
     print(
@@ -367,7 +444,12 @@ def vitoria_combate(monstro):
 
 def combate(personagem, dificuldade=1):
 
+    # Cria um novo monstro
     monstro = criar_monstro(dificuldade)
+
+    # --------------------------------------------------------
+    # APRESENTAÇÃO DO MONSTRO
+    # --------------------------------------------------------
 
     cabecalho(
         'ENCONTRO',
@@ -387,6 +469,10 @@ def combate(personagem, dificuldade=1):
     )
 
     print()
+
+    # ========================================================
+    # LOOP DO COMBATE
+    # ========================================================
 
     while True:
 
@@ -443,11 +529,12 @@ def combate(personagem, dificuldade=1):
         )
 
 
+        # Por padrão, o jogador não está defendendo.
         jogador_defendendo = False
 
 
         # ====================================================
-        # ATAQUE
+        # ATAQUE DO JOGADOR
         # ====================================================
 
         if escolha == 0:
@@ -457,8 +544,8 @@ def combate(personagem, dificuldade=1):
                 monstro
             )
 
-            # Se o monstro morreu pelo ataque,
-            # ele não terá outro turno.
+            # Se o monstro morreu,
+            # ele não terá um turno.
             if monstro['vida'] <= 0:
 
                 vitoria_combate(monstro)
@@ -467,7 +554,7 @@ def combate(personagem, dificuldade=1):
 
 
         # ====================================================
-        # DEFESA
+        # DEFESA DO JOGADOR
         # ====================================================
 
         elif escolha == 1:
@@ -478,6 +565,11 @@ def combate(personagem, dificuldade=1):
 
             print(
                 '[blue]Você entrou em posição defensiva![/blue]'
+            )
+
+            print(
+                '[yellow]O próximo ataque do monstro '
+                'causará metade do dano.[/yellow]'
             )
 
 
@@ -492,6 +584,10 @@ def combate(personagem, dificuldade=1):
                 monstro
             )
 
+            # ------------------------------------------------
+            # CONSEGUIU FUGIR
+            # ------------------------------------------------
+
             if conseguiu_fugir:
 
                 print()
@@ -502,12 +598,29 @@ def combate(personagem, dificuldade=1):
 
                 return 'fugiu'
 
-            # Se não conseguiu fugir,
-            # o monstro ganha o turno e ataca.
+
+            # ------------------------------------------------
+            # NÃO CONSEGUIU FUGIR
+            # ------------------------------------------------
+
+            print()
+
+            print(
+                '[red]O monstro aproveitou sua tentativa '
+                'de fuga e atacou![/red]'
+            )
+
             turno_monstro(
                 personagem,
                 monstro
             )
+
+            # Verifica se morreu depois do ataque.
+            if personagem.vida <= 0:
+
+                game_over()
+
+                return 'derrota'
 
             continue
 
@@ -518,5 +631,16 @@ def combate(personagem, dificuldade=1):
 
         turno_monstro(
             personagem,
-            monstro
-        ) 
+            monstro,
+            jogador_defendendo
+        )
+
+        # ----------------------------------------------------
+        # VERIFICA SE O JOGADOR MORREU
+        # ----------------------------------------------------
+
+        if personagem.vida <= 0:
+
+            game_over()
+
+            return 'derrota'

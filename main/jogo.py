@@ -61,7 +61,7 @@ def jogar():
 
         case 1:
             cabecalho('EXPLORAR')
-            iniciar_labirinto()
+            iniciar_labirinto(personagem)
             
 
         case 2:
