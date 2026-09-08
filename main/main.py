@@ -4,6 +4,7 @@ from jogo import jogar
 from utilidades import menu, cabecalho
 from conta import criar_conta, login
 
+
 escolha_menu = menu('RPG: ELIXIR', '>>> Escolha: ', ['Sair', 'Criar conta', 'Fazer login'])
 
 match escolha_menu: 
