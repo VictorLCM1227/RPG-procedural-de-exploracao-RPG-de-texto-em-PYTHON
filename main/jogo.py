@@ -2,7 +2,7 @@
 
 from time import sleep
 from utilidades import menu, cabecalho, linha
-from main.classes.personagem import Personagem
+from classes.personagem import Personagem
 
 
 def escrever(msg):
