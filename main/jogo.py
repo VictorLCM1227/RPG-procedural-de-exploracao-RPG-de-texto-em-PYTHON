@@ -3,6 +3,7 @@
 from time import sleep
 from utilidades import menu, cabecalho, linha
 from classes.personagem import Personagem
+from labirinto import iniciar_labirinto
 
 
 def escrever(msg):
@@ -60,6 +61,8 @@ def jogar():
 
         case 1:
             cabecalho('EXPLORAR')
+            iniciar_labirinto()
+            
 
         case 2:
             cabecalho('SOCORROOOOO!!!')
