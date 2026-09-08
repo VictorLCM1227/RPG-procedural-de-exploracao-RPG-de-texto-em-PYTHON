@@ -1,5 +1,6 @@
 # main/main
 
+from jogo import jogar
 from utilidades import menu, cabecalho
 from conta import criar_conta, login
 
@@ -15,4 +16,10 @@ match escolha_menu:
     case 2:
         cabecalho('FAZER LOGIN', '-')
         conta = login()
-        escolha_jogo = menu('RPG: ELIXIR', '>>> Escolha: ', ['Sair', 'Iniciar novo jogo'])
+        if conta:
+            escolha_jogo = menu('RPG: ELIXIR', '>>> Escolha: ', ['Sair', 'Iniciar novo jogo'])
+            match escolha_jogo:
+                case 0:
+                    cabecalho('SAINDO...')
+                case 1:
+                    jogar()

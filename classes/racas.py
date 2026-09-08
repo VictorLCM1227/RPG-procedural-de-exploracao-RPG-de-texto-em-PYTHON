@@ -51,3 +51,5 @@ class Orc:
     ataque = 16
     defesa = 10
     velocidade = 6
+
+    
